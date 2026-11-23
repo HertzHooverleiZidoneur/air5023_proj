@@ -1,0 +1,6 @@
+instruction: Navigate to the table and pick up the red cup.
+controller: scripted_oracle_baseline
+minimum_lift_metres: 0.05
+minimum_hold_seconds: 1.0
+require_both_fingers: true
+require_no_environment_contact: true

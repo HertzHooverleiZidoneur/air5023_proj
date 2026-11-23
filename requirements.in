@@ -1,0 +1,12 @@
+-e third_party/stretch_mujoco
+-e third_party/stretch_mujoco/third_party/robocasa
+-e third_party/stretch_mujoco/third_party/robosuite
+numpy==1.23.3
+numba==0.56.4
+mujoco==3.2.6
+mink==0.0.5
+scipy==1.10.1
+opencv-python==4.8.1.78
+matplotlib==3.10.1
+torch==2.5.1+cpu
+setuptools==75.8.0

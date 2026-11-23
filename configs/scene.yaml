@@ -1,0 +1,9 @@
+layout: 1  # RoboCasa one_wall_large
+style: 0  # industrial
+seed: 7
+table_fixture: island_counter_island_group
+target_body: red_cup_main
+target_xy: [3.55, -2.08]
+robot_start: [2.2, -1.3, 0.0]
+navigation_waypoints:
+  - [3.55, -1.3, 0.0]

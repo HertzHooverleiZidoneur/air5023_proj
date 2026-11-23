@@ -1,0 +1,78 @@
+{
+  "video": "stretch_vla_demo.mp4",
+  "source": "continuous MuJoCo simulation rollout",
+  "width": 1280,
+  "height": 720,
+  "fps": 20,
+  "frames": 1126,
+  "duration_seconds": 56.3,
+  "playback_speed": 1.0,
+  "audio": null,
+  "controller": "scripted_oracle_baseline",
+  "vla_loaded": false,
+  "scene_sha256": "969cb103efd6f2986c5e79063bfb7ff93167aab33875aaba43d8c9a81fa2ede8",
+  "video_sha256": "a568e2740e8a7a239c3a9cab5ce667d201e363cfee66aea26697151f1b2e2443",
+  "phase_events": [
+    {
+      "phase": "initialize",
+      "simulation_time": 0.0,
+      "video_time": 0.0
+    },
+    {
+      "phase": "navigate",
+      "simulation_time": 2.999999999999891,
+      "video_time": 3.0
+    },
+    {
+      "phase": "pregrasp",
+      "simulation_time": 38.50000000000109,
+      "video_time": 38.5
+    },
+    {
+      "phase": "approach",
+      "simulation_time": 44.00000000000781,
+      "video_time": 44.0
+    },
+    {
+      "phase": "close",
+      "simulation_time": 47.80000000001245,
+      "video_time": 47.8
+    },
+    {
+      "phase": "lift",
+      "simulation_time": 49.300000000014286,
+      "video_time": 49.3
+    },
+    {
+      "phase": "verify",
+      "simulation_time": 52.30000000001795,
+      "video_time": 52.3
+    },
+    {
+      "phase": "finished",
+      "simulation_time": 54.3000000000204,
+      "video_time": 54.3
+    }
+  ],
+  "task_result": {
+    "success": true,
+    "left_contact": true,
+    "right_contact": true,
+    "environment_contact": false,
+    "lift_metres": 0.13481249729275413,
+    "held_seconds": 2.0000000000024443,
+    "simulation_time": 54.3000000000204,
+    "controller": "scripted_oracle_baseline",
+    "vla_loaded": false,
+    "instruction": "Navigate to the table and pick up the red cup.",
+    "seed": 7,
+    "physics_hz": 500.0,
+    "control_hz": 20,
+    "camera_hz": 10
+  },
+  "upstream_assets": [
+    "Hello Robot Stretch MuJoCo",
+    "RoboCasa official assets"
+  ],
+  "encoder": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+}

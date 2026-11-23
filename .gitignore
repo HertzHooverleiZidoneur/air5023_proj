@@ -1,0 +1,12 @@
+.venv/
+.tools/
+.cache/
+third_party/
+out/
+scenes/kitchen/generated/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.egg-info/
+.env
+.env.*

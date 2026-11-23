@@ -1,0 +1,9 @@
+embodiment: stretch3
+physics_hz: 500
+control_hz: 20
+camera_hz: 10
+compute_mujoco_sensors: false  # no lidar in this RGB demo; cameras still render
+base_velocity_limits: [0.3, 1.0]  # m/s, rad/s
+coordinate_frame: world_z_up
+quaternion_order: wxyz
+gripper_range: [0.0, 1.0]

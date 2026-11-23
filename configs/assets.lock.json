@@ -1,0 +1,18 @@
+{
+  "repository": "robocasa/robocasa-assets",
+  "revision": "1b92c3d02ca4354984fec961357db0bff7b32166",
+  "files": {
+    "fixtures.zip": {
+      "size": 227181940,
+      "sha256": "e7bb86e9e0ef130de78200a0a7465dfb0161ed3956c65d8b3f36bdff3746c7a8"
+    },
+    "objaverse.zip": {
+      "size": 2163884721,
+      "sha256": "66a7eebef3bac855301964d35d905fc2cb44d691f007f97af08d96e83db5cc08"
+    },
+    "textures.zip": {
+      "size": 543180421,
+      "sha256": "ba3a4dcef96e199cbd601c7cdb7eb46077fb6672611b7ac74c25a191bf0be392"
+    }
+  }
+}

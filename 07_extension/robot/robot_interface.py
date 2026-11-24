@@ -24,7 +24,7 @@ JOINTS = ("lift", "arm", "wrist_yaw", "wrist_pitch", "wrist_roll", "head_pan", "
 
 class RobotInterface:
     def __init__(self, scene=None, *, model=None, gui=False, realtime=False,
-                 control_hz=None, camera_hz=None, cameras=True):
+                 control_hz=None, camera_hz=None, cameras=True, sample_cameras_on_step=True):
         from configs import load
         config = load("robot")
         control_hz = config["control_hz"] if control_hz is None else control_hz
@@ -36,6 +36,7 @@ class RobotInterface:
         self.realtime = realtime
         self.viewer = None
         self.camera_manager = None
+        self._sample_cameras_on_step = sample_cameras_on_step
         self._closed = False
         self._signals = {s: signal.getsignal(s) for s in (signal.SIGINT, signal.SIGTERM)}
         # Stop the server's optional asynchronous sensor reader before simulation.
@@ -158,7 +159,8 @@ class RobotInterface:
             if not np.isfinite(self.data.qpos).all():
                 raise RuntimeError("Non-finite simulation state")
             self.server.pull_status()
-            self._sample_cameras()
+            if self._sample_cameras_on_step:
+                self._sample_cameras()
             if self.viewer:
                 self.viewer.sync()
             if self.realtime:

@@ -22,16 +22,17 @@ class StretchSLAM:
             reference_grid=reference,
         )
         self.data = robot.data
-        self._last_time = None
+        self.latest_sample = None
 
     def read_pose(self):
         now = float(self.data.time)
-        if self._last_time is not None and now < self._last_time:
+        previous = self.latest_sample
+        if previous is not None and now < previous.sim_time:
             raise ValueError("Simulation time rewound during SLAM navigation")
-        if now != self._last_time:
+        if previous is None or now != previous.sim_time:
             sample = self.sensors.sample()
             self.estimator.update(sample)
-            self._last_time = sample.sim_time
+            self.latest_sample = sample
         pose = self.estimator.pose
         return Pose(pose.x, pose.y, pose.yaw)
 

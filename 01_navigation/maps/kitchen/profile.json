@@ -1,0 +1,17 @@
+{
+  "name": "RoboCasa Kitchen",
+  "scene": "../../../scenes/kitchen/generated/kitchen.xml",
+  "initial_pose": [2.2, -1.3, 0.0],
+  "map": "grids.json",
+  "footprint_radius_m": 0.43,
+  "stations": {
+    "A": {"pose": [4.65, -1.25, 0.0], "stand_range": 0.65},
+    "B": {"pose": [4.65, -4.40, 0.0], "stand_range": 0.65}
+  },
+  "keepouts": [
+    [1.375, -3.35, 4.125, -1.95],
+    [1.88, -3.50, 3.62, -3.25],
+    [1.25, -0.65, 5.05, 0.0],
+    [-1.05, -5.55, 5.35, -5.04]
+  ]
+}

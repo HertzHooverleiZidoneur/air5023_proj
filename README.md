@@ -18,7 +18,7 @@
 | 06 | [06_data_process](06_data_process/README.md) | 感知、数据校验、清洗和格式转换 | `06_data_process/process_episode.py` |
 | 07 | [07_extension](07_extension/README.md) | 公共机器人接口、安装、仿真与演示扩展 | `07_extension/run_sim.py`、`record_demo.py` |
 
-**[完整任务分工与协作约定](docs/development/README.md)**。负责人留待团队认领。现有抓取基线可运行；VLA 和真机后端仍需对应组开发。
+**[完整任务分工与协作约定](docs/development/README.md)**。导航和抓取基线可运行，VLA 和真机后端留待对应组开发。
 
 ## 示意视频
 
@@ -48,6 +48,8 @@ bash 07_extension/install.sh
 ```
 
 已有环境和场景时只需第二条命令。GUI 中可以实时观察机器人执行；`--linger 30` 可在任务结束后继续显示 30 秒。
+
+[Navigation Prototype](01_navigation/README.md) 提供实时 Web Console、传感器地图和 A/B 巡检。安装完成后运行 `.venv/bin/python 01_navigation/run_console.py --viewer`，在 `http://127.0.0.1:8765/` 操作同一幕仿真。
 
 ```bash
 # 单独查看厨房，不执行抓取
@@ -167,7 +169,7 @@ OpenPI/DROID 的 7 关节机械臂动作不能直接作为 Stretch 的升降、�
 ## 当前边界
 
 - 脚本基线只支持文档中的固定指令。导航目标和抓取三维坐标取自仿真真值；RGB 红色检测用于观察检查，尚未用于驱动导航或抓取。
-- 当前验证一个固定布局和杯子实例。waypoint 路径假定已知通道无障碍，尚无 SLAM、动态避障、失败重试和跨房间导航。
+- 当前验证一个固定布局和杯子实例。抓取脚本的 waypoint 路径假定已知通道空闲。独立 Navigation Prototype 提供固定地图上的 Mini SLAM、A* 和 A/B 巡检，动态避障和跨房间导航留待后续开发。
 - 厨房部分电器的旧外观资产已不在官方公开备份包中。生成器保留官方碰撞几何，以简化外观显示这些电器；缺失物理网格时直接失败，不静默移除碰撞。完整清单见 `scenes/kitchen/generated/asset_compatibility.json`。
 - 所有部署与资产适配情况见 [兼容性记录](docs/compatibility.md)。生成的 MJCF 使用绝对资产路径，移动项目后需重跑 `build_scene.py`。
 

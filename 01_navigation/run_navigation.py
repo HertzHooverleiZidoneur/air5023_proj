@@ -23,6 +23,7 @@ def main():
     maps = parser.add_mutually_exclusive_group()
     maps.add_argument("--map-in", type=Path, help="Plan and localize on a saved Mini SLAM map")
     maps.add_argument("--map-out", type=Path, help="Save the occupancy map built during the route")
+    parser.add_argument("--export-map", type=Path, help="Export the loaded or built map as PGM and YAML")
     parser.add_argument("--goal", type=float, action="append", nargs=3, metavar=("X", "Y", "YAW"),
                         help="World-frame grid goal in metres and radians. Repeat for a patrol.")
     parser.add_argument("--timeout", type=float, help="Simulated seconds (default 45 for waypoints, 150 for grid)")
@@ -41,12 +42,14 @@ def main():
         parser.error("--initial-pose must contain finite coordinates and yaw")
     if args.map_out is not None and args.map_out.exists():
         parser.error("--map-out must name a new file")
+    if args.export_map and not (args.map_in or args.map_out):
+        parser.error("--export-map requires --map-in or --map-out")
     if args.capture_dir is not None:
         args.capture_dir.mkdir(parents=True, exist_ok=True)
         if any(args.capture_dir.iterdir()):
             parser.error("--capture-dir must be empty")
     if args.headless:
-        os.environ.setdefault("MUJOCO_GL", "egl")
+        os.environ.setdefault("MUJOCO_GL", "glfw" if sys.platform == "win32" else "egl")
     from robot.robot_interface import RobotInterface
     from navigation.navigation_interface import navigate
     scene = ROOT / "scenes/kitchen/generated/kitchen.xml"
@@ -101,6 +104,10 @@ def main():
                     if args.map_out:
                         save_map(estimator.grid, args.map_out)
                         result["slam"]["map_path"] = str(args.map_out)
+                    if args.export_map:
+                        from navigation.map_exports import export_map
+
+                        export_map(reference_grid or load_map(args.map_out), args.export_map)
             except (GridNavigationError, TimeoutError, OSError, ValueError) as error:
                 parser.exit(1, f"Grid navigation: {error}\n")
             print(json.dumps(result))

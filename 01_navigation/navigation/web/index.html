@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <title>Stretch · Web Console</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="console">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Stretch 导航控制台">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>STRETCH</strong><small>导航控制台</small></span>
+      </a>
+      <div class="connection"><span id="connection-dot" class="connection-dot"></span><span id="connection-label">正在连接控制台</span></div>
+        <div class="top-metadata"><span>MUJOCO</span></div>
+    </header>
+
+    <div class="workspace">
+      <section class="map-panel" aria-label="Stretch 导航地图">
+        <div class="map-heading"><div><h1>导航地图</h1></div><span id="map-resolution" class="resolution">等待地图</span></div>
+        <div class="map-frame">
+          <canvas id="map" aria-label="地图画布。点击空闲区域设置导航目标。按住并拖动可平移，滚轮可缩放。" tabindex="0"></canvas>
+          <div class="map-toolbar" role="group" aria-label="地图视图控制">
+            <button id="zoom-in" class="icon-button" type="button" aria-label="放大地图" title="放大">+</button>
+            <button id="zoom-out" class="icon-button" type="button" aria-label="缩小地图" title="缩小">−</button>
+            <span class="toolbar-divider"></span>
+            <button id="fit-map" class="icon-button fit-button" type="button" aria-label="重置地图视图" title="重置视图">⌖</button>
+          </div>
+          <div id="map-hint" class="map-hint">点击空闲区域设置目标</div>
+          <div id="map-error" class="map-error" hidden></div>
+          <div class="scale-mark" aria-hidden="true"><span id="scale-label">— m</span><i id="scale-bar"></i></div>
+        </div>
+        <div class="map-legend" aria-label="地图图例">
+          <span><i class="swatch occupied"></i>占据</span><span><i class="swatch free"></i>空闲</span><span><i class="swatch unknown"></i>未知</span>
+          <span class="legend-spacer"></span><span><i class="line-swatch planned"></i>规划路径</span><span><i class="line-swatch trajectory"></i>运行轨迹</span><span><i class="swatch keepout"></i>静态禁行区</span>
+        </div>
+        <div class="map-coordinates"><span id="cursor-coordinate">地图坐标&nbsp; —</span><span>单位&nbsp; m</span></div>
+      </section>
+
+      <aside class="control-panel" aria-label="导航控制">
+        <section class="status-card">
+          <div class="status-head"><span id="status-indicator" class="status-indicator"></span><span id="run-status">连接中</span><span id="phase-status" class="phase-status"></span></div>
+          <p id="status-detail" class="status-detail" aria-live="polite">正在读取仿真地图与运行状态。</p>
+        </section>
+        <section id="snapshot-card" class="snapshot-card" hidden>
+          <h2>到达截图</h2>
+          <a id="snapshot-link" href="/api/snapshot" target="_blank" rel="noreferrer"><img id="snapshot-image" alt="机器人到达目标后的头部相机画面"></a>
+        </section>
+
+        <section class="goal-section">
+          <div class="section-heading"><h2>导航目标</h2></div>
+          <div class="station-buttons" role="group" aria-label="选择巡检工位">
+            <button class="station-button" id="station-a" type="button" data-station="A"><span class="station-id">A</span><span><strong>目标 A</strong><small>预设停靠点</small></span><span class="station-check" aria-hidden="true">✓</span></button>
+            <button class="station-button" id="station-b" type="button" data-station="B"><span class="station-id">B</span><span><strong>目标 B</strong><small>预设停靠点</small></span><span class="station-check" aria-hidden="true">✓</span></button>
+          </div>
+          <div class="target-readout"><span class="readout-label">选定位置</span><strong id="target-coordinate">尚未选择</strong></div>
+          <button class="map-pick" id="pick-goal" type="button"><span class="pick-crosshair" aria-hidden="true">⌖</span><span>在地图上选点</span></button>
+        </section>
+
+        <div class="action-buttons">
+          <button id="start-run" class="start-button" type="button" disabled>开始导航</button>
+          <button id="cancel-run" class="cancel-button" type="button" hidden>取消导航</button>
+          <button id="reset-sim" class="reset-button" type="button" disabled>重置仿真</button>
+        </div>
+        <p id="panel-error" class="panel-error" role="alert" hidden></p>
+
+        <div class="panel-rule"></div>
+        <section class="pose-section">
+          <div class="section-heading"><h2>估计位姿</h2></div>
+          <div class="pose-readouts"><div><span>X</span><strong id="pose-x">—</strong><small>m</small></div><div><span>Y</span><strong id="pose-y">—</strong><small>m</small></div><div><span>航向</span><strong id="pose-yaw">—</strong><small>°</small></div></div>
+          <div class="sim-readout"><span>仿真时间</span><strong id="sim-time">—</strong><small id="sequence">SEQ —</small></div>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="footer"><span id="footer-world">Stretch 静态导航地图</span><span>世界坐标&nbsp;·&nbsp;米</span></footer>
+  </main>
+</body>
+</html>

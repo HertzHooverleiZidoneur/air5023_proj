@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 from navigation.grid_navigation import GridNavigationError, navigate_grid
+from navigation.tracking import Pose
 from navigation.scene_grid import build_scene_grid
 
 
@@ -98,4 +99,28 @@ def test_timeout_pushes_zero_speed():
     with pytest.raises(TimeoutError, match="simulation-time budget"):
         navigate_grid(robot, [(1.1, 0, 0)], timeout=.05)
     assert any(v > 0 for v, _ in robot.commands)
+    assert robot.pushed[-1] == (0.0, 0.0)
+
+
+def test_supplied_grid_and_pose_source_drive_the_whole_route(monkeypatch):
+    robot = KinematicRobot()
+    measured = build_scene_grid(robot.model, robot.data, [(0, 0), (1.1, 0)]).grid
+
+    def unavailable(*args, **kwargs):
+        pytest.fail("Navigation accessed simulator pose or obstacle map")
+
+    monkeypatch.setattr(robot, "get_state", unavailable)
+    monkeypatch.setattr("navigation.grid_navigation.build_scene_grid", unavailable)
+    sampled_times = []
+
+    def estimate():
+        sampled_times.append(robot.data.time)
+        return Pose(*robot.data.qpos[:2], robot.yaw)
+
+    visits = navigate_grid(robot, [(1.1, 0, 0), (.6, .3, pi / 2)],
+                           navigation_grid=measured, pose_source=estimate)
+    assert len(visits) == 2
+    assert (visits[-1].pose.x, visits[-1].pose.y) == pytest.approx((.6, .3), abs=.025)
+    assert sorted(set(sampled_times)) == pytest.approx(
+        np.arange(round(sampled_times[-1] * robot.control_hz) + 1) / robot.control_hz)
     assert robot.pushed[-1] == (0.0, 0.0)

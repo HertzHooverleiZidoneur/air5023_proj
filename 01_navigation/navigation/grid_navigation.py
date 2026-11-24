@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import math
 
 from .planning import plan_route
-from .scene_grid import build_scene_grid
+from .scene_grid import SceneGrid, build_scene_grid, robot_radius
 from .tracking import Pose, RouteTracker
 
 
@@ -20,8 +20,9 @@ class Visit:
     sim_time: float
 
 
-def navigate_grid(robot, waypoints, timeout=150, *, on_arrival=None):
-    """Visit world-frame goals with simulator pose feedback and one static map."""
+def navigate_grid(robot, waypoints, timeout=150, *, on_arrival=None, pose_source=None,
+                  navigation_grid=None):
+    """Visit world-frame goals on a frozen grid using one pose source."""
     try:
         goals = tuple(Pose(*map(float, waypoint)) for waypoint in waypoints)
         if any(not all(math.isfinite(v) for v in (goal.x, goal.y, goal.yaw)) for goal in goals):
@@ -31,18 +32,22 @@ def navigate_grid(robot, waypoints, timeout=150, *, on_arrival=None):
         if not goals:
             return []
 
-        start = _read_pose(robot)
-        points = [(point.x, point.y) for point in (start, *goals)]
-        scene = build_scene_grid(robot.model, robot.data, points)
+        read_pose = pose_source if pose_source is not None else lambda: _read_pose(robot)
+        start = read_pose()
+        if navigation_grid is None:
+            points = [(point.x, point.y) for point in (start, *goals)]
+            scene = build_scene_grid(robot.model, robot.data, points)
+        else:
+            scene = SceneGrid(navigation_grid, robot_radius(robot.model, robot.data))
         deadline = robot.data.time + timeout
         visits = []
         for goal in goals:
-            start = _read_pose(robot)
+            start = read_pose()
             route = plan_route(scene.grid, (start.x, start.y), (goal.x, goal.y),
                                footprint_radius=scene.robot_radius + 0.05, goal_yaw=goal.yaw)
             if route is None:
                 raise GridNavigationError(f"No clear path to goal ({goal.x:g}, {goal.y:g})")
-            pose = _follow(robot, scene, route, deadline)
+            pose = _follow(robot, scene, route, deadline, read_pose)
             visit = Visit(goal, pose, route.waypoints, float(robot.data.time))
             visits.append(visit)
             if on_arrival is not None:
@@ -57,16 +62,17 @@ def _read_pose(robot):
     return Pose(*map(float, robot.get_state()["base_pose"]))
 
 
-def _follow(robot, scene, route, deadline):
+def _follow(robot, scene, route, deadline, read_pose):
     tracker = RouteTracker(route, max_vx=robot.base_limits[0], max_wz=robot.base_limits[1])
     dt = 1.0 / robot.control_hz
     while robot.data.time < deadline:
-        pose = _read_pose(robot)
+        pose = read_pose()
         command = tracker.update(pose)
         if command.reached:
             robot.move_base(0.0, 0.0)
-            robot.hold(0.3)
-            stopped = _read_pose(robot)
+            for _ in range(math.ceil(0.3 * robot.control_hz)):
+                robot.step()
+                stopped = read_pose()
             if tracker.update(stopped).reached:
                 return stopped
             continue

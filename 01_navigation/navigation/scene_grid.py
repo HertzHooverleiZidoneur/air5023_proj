@@ -21,28 +21,12 @@ def build_scene_grid(model, data, points, *, resolution=0.05, floor_z=0.0):
     The robot is expected to have a fixed arm configuration during navigation.
     A circumscribed footprint includes its collidable geometry at that posture.
     """
-    base = model.body("base_link")
-    robot_bodies = {base.id}
-    for body_id in range(base.id + 1, model.nbody):
-        if model.body_parentid[body_id] in robot_bodies:
-            robot_bodies.add(body_id)
-
-    robot_geoms = {i for i in range(model.ngeom) if model.geom_bodyid[i] in robot_bodies}
     explicit_pairs = set(zip(model.pair_geom1, model.pair_geom2))
-    paired_geoms = {geom for pair in explicit_pairs for geom in pair}
-    robot_colliders = [i for i in robot_geoms
-                       if model.geom_contype[i] or model.geom_conaffinity[i] or i in paired_geoms]
-    if not robot_colliders:
-        raise ValueError("The robot model has no collision geometry")
-
+    robot_geoms, robot_colliders = _robot_colliders(model)
     geometry = [_world_bounds(model, data, i) for i in robot_colliders]
     minimum = np.min([bounds[0] for bounds in geometry], axis=0)
     maximum = np.max([bounds[1] for bounds in geometry], axis=0)
-    base_xy = data.xpos[base.id, :2]
-    radius = float(max(np.linalg.norm(np.maximum(abs(lo[:2] - base_xy), abs(hi[:2] - base_xy)))
-                       for lo, hi in geometry))
-    if not np.isfinite(radius) or radius <= 0:
-        raise ValueError("The robot model has an invalid collision footprint")
+    radius = _radius(data.body("base_link").xpos[:2], geometry)
 
     robot_type = int(np.bitwise_or.reduce(model.geom_contype[robot_colliders]))
     robot_affinity = int(np.bitwise_or.reduce(model.geom_conaffinity[robot_colliders]))
@@ -73,6 +57,36 @@ def build_scene_grid(model, data, points, *, resolution=0.05, floor_z=0.0):
             for y in range(max(iy0, floor(lo[1] / resolution)), min(iy1, floor(hi[1] / resolution)) + 1):
                 cells[x, y] = 3.0
     return SceneGrid(StaticGrid(resolution, cells), radius)
+
+
+def robot_radius(model, data):
+    """Size the current robot footprint, independently of the obstacle map."""
+    _, colliders = _robot_colliders(model)
+    bounds = [_world_bounds(model, data, i) for i in colliders]
+    return _radius(data.body("base_link").xpos[:2], bounds)
+
+
+def _robot_colliders(model):
+    base = model.body("base_link")
+    robot_bodies = {base.id}
+    for body_id in range(base.id + 1, model.nbody):
+        if model.body_parentid[body_id] in robot_bodies:
+            robot_bodies.add(body_id)
+    robot_geoms = {i for i in range(model.ngeom) if model.geom_bodyid[i] in robot_bodies}
+    paired_geoms = set(model.pair_geom1) | set(model.pair_geom2)
+    colliders = [i for i in robot_geoms
+                 if model.geom_contype[i] or model.geom_conaffinity[i] or i in paired_geoms]
+    if not colliders:
+        raise ValueError("The robot model has no collision geometry")
+    return robot_geoms, colliders
+
+
+def _radius(base_xy, bounds):
+    radius = float(max(np.linalg.norm(np.maximum(abs(lo[:2] - base_xy), abs(hi[:2] - base_xy)))
+                       for lo, hi in bounds))
+    if not np.isfinite(radius) or radius <= 0:
+        raise ValueError("The robot model has an invalid collision footprint")
+    return radius
 
 
 def _world_bounds(model, data, geom_id):

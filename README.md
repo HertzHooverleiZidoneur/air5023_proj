@@ -79,7 +79,7 @@ Stretch 3 在 MuJoCo 圆桌场景中完成抓起、放下和撤手。它从固�
 .venv/bin/python 02_manipulation_vla/run_tcp_retarget.py --output out/round_table_demo
 ```
 
-加 `--gui` 可在 MuJoCo 窗口观看。仓库提供单条 TCP 输入、初始状态、圆桌资产和 Stretch 的实测复跑输出。[抓放与数据交接](02_manipulation_vla/examples/g1_tcp_round_table/README.md) · [复跑指标](02_manipulation_vla/examples/g1_tcp_round_table/stretch_run/metrics.json) · [Stretch 仿真录像](media/stretch_round_table.mp4)
+加 `--gui` 可在 MuJoCo 窗口观看。仓库提供单条 TCP 输入、初始状态和圆桌资产。复跑指标与逐步轨迹由脚本写到本地 `out/round_table_demo/`。[抓放与数据交接](02_manipulation_vla/examples/g1_tcp_round_table/README.md) · [Stretch 仿真录像](media/stretch_round_table.mp4)
 
 ## 运行结果
 

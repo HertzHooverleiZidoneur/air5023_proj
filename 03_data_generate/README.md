@@ -22,6 +22,65 @@
   --with-images --output out/team03/episode_002
 ```
 
+## 实拍圆桌参考场景
+
+[round_table.xml](../scenes/round_table/round_table.xml) 是一份独立的 MuJoCo 场景，包含圆桌、红盖瓶、开口圆罐和浅色包装。以视频约 25 秒的桌面画面为主，利用标记卡校正透视，再结合其他角度和参考图估计物体的形状。桌面直径取 1.0 m、高度取 0.75 m。几何尺寸、质量和摩擦均为近似值。
+
+在项目根目录用已安装 MuJoCo 的项目环境打开：
+
+```bash
+.venv/bin/python -m mujoco.viewer --mjcf scenes/round_table/round_table.xml
+```
+
+可以在查看器中选择 `overview` 或 `tabletop` 相机。三个桌面物体都是带碰撞的自由刚体。场景无需 RoboCasa 资产，当前用于检查布局和接触，尚未接入机器人或抓取任务。
+
+### 把圆桌放入厨房
+
+生成原厨房的 `kitchen.xml` 后，在项目根目录运行：
+
+```bash
+.venv/bin/python 03_data_generate/add_round_table.py --xy 0.55 -2.6 && .venv/bin/python -m mujoco.viewer --mjcf scenes/kitchen/generated/kitchen_round_table.xml
+```
+
+`--xy` 是圆桌中心在厨房世界坐标系中的位置，单位为米。这组坐标在岛台左侧。合并脚本写出独立的 `kitchen_round_table.xml`，原抓取入口继续使用 `kitchen.xml`。换位置后需重新检查桌体和周围家具的间隙。
+
+### 生成多组圆桌条件
+
+[配置清单](../configs/round_table_conditions.json) 定义五组固定偏移，单位为米，坐标方向沿厨房世界坐标轴。五组包括参考摆放、圆罐沿 X 轴向两侧各移动 4.5 cm、向桌内移动 4.5 cm，以及瓶子和包装靠近圆罐。
+
+```bash
+.venv/bin/python 03_data_generate/add_round_table.py --xy 0.55 -2.6 --conditions configs/round_table_conditions.json
+```
+
+生成器检查初始物体重叠，并运行 5 秒仿真确认物体直立、保持桌面接触。输出位于 `scenes/kitchen/generated/`，其中 `round_table_conditions.json` 记录条件 ID、场景文件、世界坐标和 SHA-256。使用相同厨房和配置可重建同一组条件。
+
+### 生成圆桌和岛台的 16 组干扰条件
+
+圆桌沿用实拍参考场景，目标为圆罐。另一套沿用 RoboCasa `one_wall_large` 厨房中的原岛台，目标为红杯。每套包含八组，原来五组圆桌摆位配置仍可单独生成。
+
+| 条件 | 设计 |
+|---|---|
+| A | 原场景和原目标位置 |
+| B | 原底盘路线放一个垃圾桶，保留绕行路线 |
+| C | 用围挡封闭任务的原停靠区，预期规划返回不可达 |
+| D1 / D2 | 分别用纸盒和圆柱容器挡住原机械臂接近路线 |
+| E | 组合 B 和 D1 |
+| F1 / F2 | 分别增加两个和三个桌面干扰物。F2 含与目标外观相近的圆柱体 |
+
+```bash
+.venv/bin/python 03_data_generate/build_challenge_scenes.py
+```
+
+生成器读取 [干扰物配置](../configs/tabletop_challenges.json)，在已生成的 `kitchen.xml` 同级目录写入 16 份 `challenge_*.xml` 和 `tabletop_challenges.json`。先检查新增地面障碍的几何间隙、桌面物体初始重叠与 5 秒静置，整批通过后写出。清单包含目标物体、原停靠位姿、场景哈希，以及 B/E 的候选绕行航点。在 macOS 上若环境设有 Linux 专用的 `MUJOCO_GL=egl`，运行时设为 `MUJOCO_GL=cgl`。
+
+C 的负例针对清单指定的停靠区。B 和 E 提供候选绕行航点。
+
+例如，在 MuJoCo 查看器中打开圆桌封路条件：
+
+```bash
+.venv/bin/python -m mujoco.viewer --mjcf scenes/kitchen/generated/challenge_round_c.xml
+```
+
 ## 数据交接格式
 
 - `episode.json`：`episode-1.0`，指令、状态/执行器顺序、频率、seed、场景 hash、策略来源和结果。

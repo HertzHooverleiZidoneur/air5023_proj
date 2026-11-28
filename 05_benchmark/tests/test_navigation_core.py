@@ -65,6 +65,15 @@ def test_parking_alignment_allows_small_drift_while_turning():
     assert tracker.update(Pose(.98, 0.0, math.pi / 2)).reached
 
 
+def test_faster_cruise_respects_base_limit_and_tapers_before_waypoints():
+    route = Route(((0.0, 0.0), (1.0, 0.0)))
+    normal = RouteTracker(route, max_vx=0.29, max_wz=1.0)
+    faster = RouteTracker(route, max_vx=0.29, max_wz=1.0, cruise_speed=0.30)
+    assert normal.update(Pose()).vx == 0.22
+    assert faster.update(Pose()).vx == 0.29
+    assert faster.update(Pose(.91, 0.0)).vx == normal.update(Pose(.91, 0.0)).vx
+
+
 def test_route_respects_rectangular_keepouts():
     grid = free_grid()
     route = plan_route(grid, (0.25, 0.75), (1.25, 0.75), footprint_radius=0.05,

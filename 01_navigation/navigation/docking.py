@@ -10,15 +10,21 @@ from .tracking import Pose
 @dataclass(frozen=True)
 class Station:
     pose: Pose
-    stand_range: float
+    stand_range: float | None = None
     approach_distance: float = 0.35
 
     def __post_init__(self):
+        distances = (self.approach_distance,) if self.stand_range is None else (
+            self.stand_range, self.approach_distance)
         if not all(math.isfinite(value) for value in (self.pose.x, self.pose.y, self.pose.yaw,
-                                                       self.stand_range, self.approach_distance)):
+                                                       *distances)):
             raise ValueError("Station pose and distances must be finite")
-        if self.stand_range <= 0 or self.approach_distance <= 0:
+        if (self.stand_range is not None and self.stand_range <= 0) or self.approach_distance <= 0:
             raise ValueError("Station standoff and approach must be positive")
+
+    @property
+    def uses_lidar_docking(self):
+        return self.stand_range is not None
 
     @property
     def approach(self):
@@ -43,6 +49,8 @@ def station_depth(station, pose, lidar, sample):
     cluster near the predicted plane so a single ray cannot determine arrival.
     The configured standoff is measured from the robot base origin.
     """
+    if not station.uses_lidar_docking:
+        return None
     remaining, lateral, heading = station.offsets(pose)
     if not (-0.18 <= remaining <= station.approach_distance + 0.18
             and abs(lateral) <= 0.12 and abs(heading) <= 0.18):

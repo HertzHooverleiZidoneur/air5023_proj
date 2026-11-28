@@ -53,10 +53,14 @@
 
         <section class="goal-section">
           <div class="section-heading"><h2>导航目标</h2></div>
-          <div class="station-buttons" role="group" aria-label="选择巡检工位">
-            <button class="station-button" id="station-a" type="button" data-station="A"><span class="station-id">A</span><span><strong>目标 A</strong><small>预设停靠点</small></span><span class="station-check" aria-hidden="true">✓</span></button>
-            <button class="station-button" id="station-b" type="button" data-station="B"><span class="station-id">B</span><span><strong>目标 B</strong><small>预设停靠点</small></span><span class="station-check" aria-hidden="true">✓</span></button>
-          </div>
+          <div class="station-buttons" role="group" aria-label="选择预设停靠点"></div>
+          <template id="station-button-template">
+            <button class="station-button" type="button">
+              <span class="station-id"></span>
+              <span><strong></strong><small>预设停靠点</small></span>
+              <span class="station-check" aria-hidden="true">✓</span>
+            </button>
+          </template>
           <div class="target-readout"><span class="readout-label">选定位置</span><strong id="target-coordinate">尚未选择</strong></div>
           <button class="map-pick" id="pick-goal" type="button"><span class="pick-crosshair" aria-hidden="true">⌖</span><span>在地图上选点</span></button>
         </section>

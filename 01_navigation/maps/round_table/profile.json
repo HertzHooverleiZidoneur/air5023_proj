@@ -1,0 +1,14 @@
+{
+  "name": "Round Table Navigation",
+  "scene": "../../../scenes/kitchen/generated/kitchen_round_table_navigation.xml",
+  "initial_pose": [1.65, -2.6, 0.606],
+  "map": "grids.json",
+  "footprint_radius_m": 0.43,
+  "cruise_speed_m_s": 0.30,
+  "obstacles": [[2.47, -2.04, 2.71, -1.86]],
+  "overview_camera": [2.85, -1.95, 7.1],
+  "stations": {
+    "A": {"pose": [3.525055, -1.299938, -0.00249]}
+  },
+  "keepouts": [[3.071195, -2.898504, 3.971195, -1.998504]]
+}

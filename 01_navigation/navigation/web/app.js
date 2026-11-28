@@ -350,8 +350,17 @@
       view.map = validMap(await request('/api/map'));
       elements.resolution.textContent = `${fmt(view.map.resolution, 3)} m / 格`;
       elements.footer.textContent = `占据栅格 · ${view.map.width} × ${view.map.height}`;
-      $('#station-a').disabled = !view.map.stations || !view.map.stations.A;
-      $('#station-b').disabled = !view.map.stations || !view.map.stations.B;
+      const template = $('#station-button-template').content.firstElementChild;
+      const stations = $('.station-buttons');
+      for (const name of Object.keys(view.map.stations || {}).sort()) {
+        const button = template.cloneNode(true);
+        button.id = `station-${name.toLowerCase()}`;
+        button.dataset.station = name;
+        button.querySelector('.station-id').textContent = name;
+        button.querySelector('strong').textContent = `目标 ${name}`;
+        button.addEventListener('click', () => setStation(name));
+        stations.append(button);
+      }
       render(); resizeObserver = new ResizeObserver(render); resizeObserver.observe(canvas.parentElement);
       await poll();
     } catch (error) {
@@ -488,7 +497,6 @@
   $('#zoom-out').addEventListener('click', () => { const r = canvas.getBoundingClientRect(); zoomAt(0.8, r.left + r.width / 2, r.top + r.height / 2); });
   $('#fit-map').addEventListener('click', fitView);
   elements.pick.addEventListener('click', () => { if (active()) return; picking = !picking; elements.pick.classList.toggle('picking', picking); updateMapHint(); canvas.focus(); });
-  document.querySelectorAll('.station-button').forEach((button) => button.addEventListener('click', () => setStation(button.dataset.station)));
   elements.start.addEventListener('click', startRun);
   elements.cancel.addEventListener('click', cancelRun);
   elements.reset.addEventListener('click', resetSim);

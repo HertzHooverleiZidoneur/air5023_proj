@@ -1,4 +1,4 @@
-"""Evaluate continuous A/B/A docking and cancellation in the Navigation Prototype."""
+"""Evaluate a station sequence, or the default A/B/A patrol with cancellation."""
 
 import argparse
 import csv
@@ -58,11 +58,13 @@ class NavigationEvaluation:
         _, x, y, yaw = self.truth[-1]
         slam = self.session.slam
         station = visit.goal
+        station_config = self.profile.stations[label]
         result = {"station": label, **asdict(visit), "truth_pose": [x, y, yaw],
                   "position_error_m": math.dist((x, y), (station.x, station.y)),
-                  "heading_error_rad": abs(angle_difference(yaw, station.yaw)),
-                  "depth_residual_m": station_depth(self.profile.stations[label], visit.pose,
-                                                    slam.sensors.lidar, slam.latest_sample)}
+                  "heading_error_rad": abs(angle_difference(yaw, station.yaw))}
+        if station_config.uses_lidar_docking:
+            result["depth_residual_m"] = station_depth(station_config, visit.pose,
+                                                       slam.sensors.lidar, slam.latest_sample)
         if self.robot.camera_manager:
             from PIL import Image
 
@@ -71,22 +73,25 @@ class NavigationEvaluation:
             result["head_rgb"] = image
         return result
 
-    def run(self):
-        for label in ("A", "B", "A"):
+    def run(self, stations=None):
+        patrol = stations is None
+        result = {}
+        if not patrol:
+            self.record(self.session.pose, "start")
+        for label in (("A", "B", "A") if patrol else stations):
             station = self.profile.stations[label]
-            if label == "B":
+            if patrol and label == "B":
                 cancel_at = self.robot.data.time + 1.5
                 cancelled = self.session.go(station.pose, station=station, on_update=self.record,
                                             cancelled=lambda: self.robot.data.time >= cancel_at)
                 if cancelled is not None:
                     raise RuntimeError("Expected the first B request to cancel before arrival")
-                cancellation = float(self.robot.data.time)
-                cancel_pose = asdict(self.session.pose)
-                cancel_velocity = self.robot.get_state()["base_velocity"].tolist()
+                result.update(cancelled_at_s=float(self.robot.data.time),
+                              cancelled_pose=asdict(self.session.pose),
+                              cancelled_velocity_m_s_rad_s=self.robot.get_state()["base_velocity"].tolist())
             visit = self.session.go(station.pose, station=station, on_update=self.record)
             self.visits.append(self.arrival(visit, label))
-        return {"visits": self.visits, "cancelled_at_s": cancellation, "cancelled_pose": cancel_pose,
-                "cancelled_velocity_m_s_rad_s": cancel_velocity}
+        return {"visits": self.visits, **result}
 
     def save(self, result):
         from navigation.docking import angle_difference
@@ -124,16 +129,27 @@ def main():
     parser.add_argument("--profile", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--no-cameras", action="store_true")
+    parser.add_argument("--station", choices=("A", "B"), action="append",
+                        help="station to visit (repeat for a sequence without cancellation)")
     args = parser.parse_args()
     os.environ.setdefault("MUJOCO_GL", "glfw" if sys.platform == "win32" else "egl")
     from navigation.prototype import load_profile, open_session
 
     profile = load_profile(args.profile)
+    if args.station is None and set(profile.stations) == {"A"}:
+        args.station = ["A"]
+    if args.station is not None:
+        missing = [label for label in args.station if label not in profile.stations]
+        if missing:
+            parser.error(f"Unknown station(s) for this profile: {', '.join(missing)}")
     args.out.mkdir(parents=True)
     with open_session(profile, realtime=False, cameras=not args.no_cameras) as session:
         evaluation = NavigationEvaluation(session, profile, args.out)
         try:
-            result = evaluation.run()
+            result = evaluation.run(args.station)
+            if args.station is not None:
+                result.update(start_pose=profile.initial_pose, obstacles=profile.obstacles,
+                              cruise_speed_m_s=min(profile.cruise_speed, float(session.robot.base_limits[0])))
         except Exception as error:
             evaluation.save({"visits": evaluation.visits, "error": str(error)})
             raise

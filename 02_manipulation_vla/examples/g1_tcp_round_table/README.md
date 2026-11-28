@@ -1,6 +1,6 @@
-# G1 示教迁移到 Stretch 3 圆桌抓放
+# Stretch 3 圆桌抓放复跑
 
-将 G1 真机抓瓶示教在 Isaac 中对齐回放，提取右手捏合中心近似位置（TCP）和开合事件。Stretch 使用自身 IK 跟踪世界坐标中的三维目标。目标夹爪在落桌时沿 Z 下探，确认有桌面承托后松开，停顿 0.55 秒，再撤手。水瓶为自由刚体，夹持和放置依靠接触物理。
+Stretch 3 从固定 dock 起步，在 MuJoCo 中抓起水瓶并放回圆桌。源动作来自 G1 真机抓瓶示教的 Isaac 回放，提取右手捏合中心近似位置（TCP）及开合事件。Stretch 用自身 IK 计算关节指令。放置时夹爪沿 Z 下探，确认有桌面承托后松开，停顿 0.55 秒再撤手。水瓶为自由刚体，夹持和放置依靠接触物理。
 
 验证范围为固定圆桌、固定水瓶初始位置和保存的停靠状态。轨迹以仿真中的瓶子位置完成初始对齐。导航到停靠点、VLA 和 Stretch 真机部署是其他验证任务。200 集 Isaac G1 训练数据由原数据项目管理。
 
@@ -21,10 +21,12 @@
 
 | 文件 | 用途 |
 |---|---|
-| [g1_tcp_source.npz](g1_tcp_source.npz) | 单条示教从 Isaac 回放提取的时间、TCP 位置、XY 旋转和开合事件 |
+| [源输入 g1_tcp_source.npz](g1_tcp_source.npz) | 从单条 G1 示教的 Isaac 回放提取的时间、TCP 位置、XY 旋转和开合事件 |
 | [source_manifest.json](source_manifest.json) | 源示教 ID、回放版本、校验值、采样率、标定窗口和字段定义 |
 | [场景变体及初始状态](../../../scenes/round_table) | `objects.xml` 和 `assets/` 记录从 G1 圆桌和水瓶模型导出的几何、材质和碰撞。`dock.json` 按名称保存 Stretch 初始关节状态，底盘四元数顺序为 `wxyz` |
-| [原实验仿真录像](../../../media/stretch_g1_round_table.mp4) | 从停靠点开始的完整抓放 |
+| [Stretch 复跑指标](stretch_run/metrics.json) | MuJoCo 中测得的抬升高度、夹持时长、放置稳定性、跟踪误差和落点偏移 |
+| [Stretch 复跑轨迹](stretch_run/trajectory.jsonl) | 从固定 dock 执行时记录的 518 条控制周期数据，含目标与实际关节位置、实测 TCP、瓶子位置和接触状态 |
+| [Stretch 仿真录像](../../../media/stretch_round_table.mp4) | 从停靠点开始的完整抓放 |
 
 源轨迹为 433 帧、24 Hz，时间从 0 到 18 s。闭合和打开分别发生在 2.875 s、13.25 s。执行时对位置做 9 帧二阶 Savitzky–Golay 平滑，以闭合帧为原点，将 XY 位移旋转约 −117.57°，保持位移比例 1，并插值到 20 Hz 控制周期。腕部的姿态仅在离线提取 TCP 时用于计算捏合中心。执行时的 IK 约束 Stretch 的 TCP 位置。
 

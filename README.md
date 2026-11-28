@@ -70,16 +70,16 @@ MUJOCO_GL=egl .venv/bin/python 02_manipulation_vla/run_task.py --headless
 
 依赖下载需要网络，图形渲染需要可用的 OpenGL/EGL。安装过程中使用项目内 `.tools/` 和 `.venv/`，不需要 ROS2/Nav2。首次下载约 2.93 GB 资产，解压约 7 GB，另需 Python 包和仓库空间。当前 Torch 使用 CPU 版，仅满足旧版 RoboCasa 的传递依赖。
 
-## 圆桌水瓶抓放
+## Stretch 3 圆桌水瓶抓放
 
-将对齐后的 G1 示教回放转换为 TCP 位置轨迹和夹爪开合事件，用 Stretch 自己的 IK 在 MuJoCo 中复现抓放。示例从固定停靠状态开始。安装完成后，在项目根目录运行：
+Stretch 3 在 MuJoCo 圆桌场景中完成抓起、放下和撤手。它从固定停靠状态起步，用自身的逆运动学跟踪从 G1 示教回放提取的 TCP 位置，并执行对应的夹爪开合事件。安装完成后，在项目根目录运行：
 
 ```bash
 .venv/bin/python 03_data_generate/build_round_table.py
 .venv/bin/python 02_manipulation_vla/run_tcp_retarget.py --output out/round_table_demo
 ```
 
-加 `--gui` 可在 MuJoCo 窗口观看。仓库提供单条 TCP 样例、初始状态和圆桌资产。详见 [圆桌抓放与数据交接](02_manipulation_vla/examples/g1_tcp_round_table/README.md) 和 [仿真录像](media/stretch_g1_round_table.mp4)。
+加 `--gui` 可在 MuJoCo 窗口观看。仓库提供单条 TCP 输入、初始状态、圆桌资产和 Stretch 的实测复跑输出。[抓放与数据交接](02_manipulation_vla/examples/g1_tcp_round_table/README.md) · [复跑指标](02_manipulation_vla/examples/g1_tcp_round_table/stretch_run/metrics.json) · [Stretch 仿真录像](media/stretch_round_table.mp4)
 
 ## 运行结果
 

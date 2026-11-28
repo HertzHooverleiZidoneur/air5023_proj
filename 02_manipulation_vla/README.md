@@ -7,7 +7,7 @@
 | 文件 | 当前能力 |
 |---|---|
 | [manipulation/arm_controller.py](manipulation/arm_controller.py) | 五个独立手臂坐标的有界 IK |
-| [manipulation/tcp_retarget.py](manipulation/tcp_retarget.py) | G1 TCP 位置迁移、圆桌承托检查和撤手 |
+| [manipulation/tcp_retarget.py](manipulation/tcp_retarget.py) | Stretch TCP 跟踪、圆桌承托检查和撤手 |
 | [tasks/pick_red_cup.py](tasks/pick_red_cup.py) | 初始化→导航→抓取→抬升→检查，支持阶段回调 |
 | [vla/policy_interface.py](vla/policy_interface.py) | `reset/predict` 协议和动作块执行循环 |
 | [vla/observation_adapter.py](vla/observation_adapter.py) | 明确状态顺序、图像、时间与夹爪归一化 |

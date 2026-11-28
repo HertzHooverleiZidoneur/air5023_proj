@@ -23,8 +23,13 @@
 |---|---|
 | [g1_tcp_source.npz](g1_tcp_source.npz) | 单条示教从 Isaac 回放提取的时间、TCP 位置、XY 旋转和开合事件 |
 | [source_manifest.json](source_manifest.json) | 源示教 ID、回放版本、校验值、采样率、标定窗口和字段定义 |
+| [Stretch 复跑示例轨迹 CSV](stretch_example_trajectory.csv) | 单次通过验收的 MuJoCo 圆桌抓放记录，包含 518 个控制周期 |
 | [场景变体及初始状态](../../../scenes/round_table) | `objects.xml` 和 `assets/` 记录从 G1 圆桌和水瓶模型导出的几何、材质和碰撞。`dock.json` 按名称保存 Stretch 初始关节状态，底盘四元数顺序为 `wxyz` |
 | [原实验仿真录像](../../../media/stretch_g1_round_table.mp4) | 从停靠点开始的完整抓放 |
+
+示例 CSV 来自 Stretch 3 执行抓放时的实际仿真记录。每行对应一个 20 Hz 控制周期，`time_s` 以第一个采样为零点，范围为 0.00–25.85 秒。`phase` 标记动作阶段。`base_*`、`tcp_*` 和 `bottle_*` 使用场景世界坐标，长度单位为米，底盘航向为弧度。`tcp_goal_*` 是当期目标，保持阶段沿用关节目标时该列留空。
+
+`target_*` 是当期关节指令，`actual_*` 是周期结束时测得的关节位置。`lift` 与总伸臂量 `arm` 以米计，腕部角以弧度计。`gripper_open_cmd` 记录开合指令，1 为张开，0 为闭合。
 
 源轨迹为 433 帧、24 Hz，时间从 0 到 18 s。闭合和打开分别发生在 2.875 s、13.25 s。执行时对位置做 9 帧二阶 Savitzky–Golay 平滑，以闭合帧为原点，将 XY 位移旋转约 −117.57°，保持位移比例 1，并插值到 20 Hz 控制周期。腕部的姿态仅在离线提取 TCP 时用于计算捏合中心。执行时的 IK 约束 Stretch 的 TCP 位置。
 

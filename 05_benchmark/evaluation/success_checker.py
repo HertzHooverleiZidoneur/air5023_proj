@@ -2,6 +2,7 @@
 from types import SimpleNamespace
 import numpy as np
 from robosuite.utils.sim_utils import check_contact
+from .criteria import HoldCheck
 
 
 def descendant_geoms(model, body_name):
@@ -21,7 +22,10 @@ class SuccessChecker:
         self.robot, self.target_body = robot, target_body
         self.initial_height = float(robot.data.body(target_body).xpos[2])
         self.lift_height, self.hold_seconds = lift_height, hold_seconds
-        self.held_since = None
+        hz = getattr(robot, "control_hz", None)
+        self.check = HoldCheck(lift_height, hold_seconds, 1.5 / hz if hz else None)
+        if not np.isfinite(self.initial_height):
+            raise ValueError("Target initial height must be finite")
         self.last = {}
         model = robot.model
         # The official Stretch model has unnamed collision geoms. Supply stable
@@ -32,6 +36,8 @@ class SuccessChecker:
         self.target = group(target_body)
         self.left = group("link_gripper_finger_left")
         self.right = group("link_gripper_finger_right")
+        if not self.target or not self.left or not self.right:
+            raise ValueError("Target and both fingers must have geometry")
         excluded = set(group("base_link") + self.target)
         self.environment = [name for name in names if name not in excluded]
 
@@ -41,15 +47,12 @@ class SuccessChecker:
         right = check_contact(self.sim, self.right, self.target)
         supported = check_contact(self.sim, self.target, self.environment)
         height = float(data.body(self.target_body).xpos[2])
-        lifted = height - self.initial_height >= self.lift_height
-        valid = left and right and lifted and not supported and np.isfinite(data.qpos).all()
-        if not valid:
-            self.held_since = None
-        elif self.held_since is None:
-            self.held_since = float(data.time)
-        held = 0.0 if self.held_since is None else float(data.time - self.held_since)
-        self.last = {"success": bool(valid and held + 1e-8 >= self.hold_seconds),
-                     "left_contact": left, "right_contact": right,
-                     "environment_contact": supported, "lift_metres": height - self.initial_height,
-                     "held_seconds": held, "simulation_time": float(data.time)}
+        self.last = self.check.update(
+            time=float(data.time), lift=height - self.initial_height,
+            left=left, right=right, supported=supported,
+            finite=bool(np.isfinite(data.qpos).all() and np.isfinite(getattr(data, "qvel", [])).all()))
         return self.last
+
+    @property
+    def held_since(self):
+        return self.check.held_since

@@ -1,0 +1,40 @@
+{
+  "base_scene": {
+    "seed": 7,
+    "layout": 1,
+    "style": 0
+  },
+  "replace_bodies": [
+    "sink_island_group_main",
+    "island_counter_island_group_main",
+    "island_stack_1_island_group_base_main",
+    "island_stack_1_island_group_1_main",
+    "island_stack_1_island_group_2_main",
+    "dishwasher_island_group_main",
+    "island_panel_cab_right_island_group_base_main",
+    "island_panel_cab_right_island_group_1_main",
+    "island_cab_left_island_group_base_main",
+    "island_cab_left_island_group_1_main",
+    "island_cab_left_island_group_2_main",
+    "island_cab_left_island_group_3_main",
+    "island_cab_left_island_group_4_main",
+    "island_panel_cab_left_island_group_base_main",
+    "island_panel_cab_left_island_group_1_main",
+    "island_base_box_island_group_main",
+    "stool_1_island_group_main",
+    "stool_2_island_group_main",
+    "stool_3_island_group_main"
+  ],
+  "table_diameter_m": 0.9,
+  "table_height_m": 0.76,
+  "table_center_world_m": [
+    3.521194716791256,
+    -2.4485040567728844,
+    0
+  ],
+  "bottle_initial_world_m": [
+    3.55,
+    -2.08,
+    0.76
+  ]
+}

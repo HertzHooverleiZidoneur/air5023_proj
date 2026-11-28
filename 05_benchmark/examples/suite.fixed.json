@@ -1,0 +1,12 @@
+{
+  "schema_version": "benchmark-suite-1.0",
+  "conditions": [
+    {
+      "id": "fixed-kitchen",
+      "scene": "../../scenes/kitchen/generated/kitchen.xml",
+      "metadata": "../../scenes/kitchen/generated/metadata.json",
+      "seed": 7,
+      "description": "Existing fixed scene; repeated runs do not establish generalization."
+    }
+  ]
+}

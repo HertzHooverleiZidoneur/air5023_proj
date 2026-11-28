@@ -1,0 +1,12 @@
+{
+  "schema_version": "benchmark-suite-1.0",
+  "conditions": [
+    {
+      "id": "fixed-kitchen",
+      "scene": "/root/air5023_proj/scenes/kitchen/generated/kitchen.xml",
+      "metadata": "/root/air5023_proj/scenes/kitchen/generated/metadata.json",
+      "seed": 7,
+      "description": "Local Ubuntu-22.04 installation; run using its existing Python environment. Machine-specific example, not a portable suite."
+    }
+  ]
+}

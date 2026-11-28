@@ -4,3 +4,10 @@ minimum_lift_metres: 0.05
 minimum_hold_seconds: 1.0
 require_both_fingers: true
 require_no_environment_contact: true
+navigation_position_tolerance_metres: 0.05
+navigation_heading_tolerance_radians: 0.08726646259971647
+maximum_navigation_collision_events: 0
+safe_rejection:
+  minimum_stop_seconds: 0.3
+  maximum_linear_speed_mps: 0.015
+  maximum_angular_speed_rps: 0.04

@@ -25,6 +25,39 @@
 
 锁定版本的 Stretch 和 RoboCasa 厨房中，A → B → A 在同一幕跑完，B 的首次请求在行驶中取消并停稳，随后重试到达。三次停车位置误差为 6.49、5.49、7.32 cm，航向误差为 0.25°、2.88°、0.98°，末端墙距残差约 1.8 cm。20 Hz 控制采样中未见机器人与非地面物体接触。轮式里程计、融合里程计和 Mini SLAM 的平面位置 RMSE 分别为 18.36、7.41 和 6.39 cm。停靠深度已用墙距闭环校正，横向精度仍受地图定位误差影响。
 
+## 圆桌导航配置
+
+[圆桌导航配置](maps/round_table/profile.json) 配套 Mini SLAM 采集的 5 cm 地图，含 9,736 个栅格。导航场景复用团队的圆桌和水瓶，沿用抓取示例的底盘停靠位作为 A 工位。Stretch 从独立出生位姿出发，绕过固定箱体后在 A 停稳。 [圆桌抓取示例](../02_manipulation_vla/examples/g1_tcp_round_table/README.md)
+
+按项目安装说明准备依赖，在仓库根目录依次生成厨房、圆桌厨房和独立导航场景。
+
+```bash
+.venv/bin/python 03_data_generate/build_scene.py
+.venv/bin/python 03_data_generate/build_round_table.py
+.venv/bin/python 03_data_generate/build_round_table_navigation.py
+```
+
+运行以下命令，在 `http://127.0.0.1:8765/` 选择 A 并开始导航。在 MuJoCo 查看器中可选择 `navigation_overview` 相机俯瞰路线。
+
+```bash
+.venv/bin/python 01_navigation/run_console.py --viewer --profile 01_navigation/maps/round_table/profile.json
+```
+
+重新测绘时，先经过南侧两个航点补足起点后方的地图，再前往 A 工位。地图及 ROS 导出写入 `out/round-table-survey/`。复跑请改用新的输出目录。
+
+```bash
+.venv/bin/python 01_navigation/run_navigation.py --headless --planner grid --scene scenes/kitchen/generated/kitchen_round_table_navigation.xml --localization slam \
+  --initial-pose 1.65 -2.60 0.606 --goal 1.65 -3.40 1.57079632679 --goal 0.80 -3.35 1.57079632679 \
+  --goal 3.525055 -1.299938 -0.00249 --map-out out/round-table-survey/grids.json \
+  --export-map out/round-table-survey/round_table --timeout 320
+```
+
+以下命令用已保存的地图评测 A 工位，输出停车误差和三种定位估计。复跑请改用新的输出目录。
+
+```bash
+.venv/bin/python 05_benchmark/evaluate_navigation_prototype.py --profile 01_navigation/maps/round_table/profile.json --station A --no-cameras --out out/round-table-evaluation
+```
+
 ## 现有文件和运行
 
 | 文件 | 当前能力 |

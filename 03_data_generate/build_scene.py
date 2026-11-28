@@ -60,6 +60,13 @@ def build(seed=None):
     cup_asset = adapt_cup_asset(out / "cup_2_legacy.xml")
     missing_visual_assets = []
 
+    class LegacyCup(MJCFObject):
+        def postprocess_model_xml(self, xml_str):
+            # Expat needs the standard spelling for XML with non-ASCII asset paths.
+            xml_str = xml_str.replace("encoding='utf8'", "encoding='utf-8'", 1)
+            result = super().postprocess_model_xml(xml_str)
+            return result.replace("encoding='utf8'", "encoding='utf-8'", 1)
+
     class StretchRedCupKitchen(Kitchen):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, seed=seed, obj_registries=("objaverse",), **kwargs)
@@ -77,7 +84,7 @@ def build(seed=None):
                                         pos=(-0.6, 0.7), rotation=(0, 0)))]
 
         def _create_obj(self, cfg):
-            return MJCFObject(name=cfg["name"], mjcf_path=str(cup_asset), scale=0.85), {
+            return LegacyCup(name=cfg["name"], mjcf_path=str(cup_asset), scale=0.85), {
                 "cat": "cup", "mjcf_path": str(cup_asset), "groups": ["cup"],
                 "groups_containing_sampled_obj": ["cup", "receptacle"], "split": None}
 

@@ -1,0 +1,7 @@
+{
+  "baseline": {},
+  "jar_left": {"jar": [-0.045, 0.0]},
+  "jar_right": {"jar": [0.045, 0.0]},
+  "jar_inward": {"jar": [0.0, 0.045]},
+  "clutter_closer": {"bottle": [-0.055, -0.02], "package": [-0.02, -0.025]}
+}

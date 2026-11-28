@@ -1,0 +1,30 @@
+<mujoco model="stretch_round_table_objects">
+  <asset>
+    <mesh name="g1_bottle_shell" file="assets/g1_bottle_shell.obj" />
+    <mesh name="g1_bottle_label" file="assets/g1_bottle_label.obj" />
+    <mesh name="g1_bottle_collision" file="assets/g1_bottle_collision.obj" />
+    <texture name="g1_bottle_wrap" type="2d" file="assets/g1_bottle_wrap.png" />
+    <material name="g1_bottle_print" texture="g1_bottle_wrap" rgba="1 1 1 1" />
+    <mesh name="g1_round_veneer" file="assets/g1_round_veneer.obj" />
+    <texture name="g1_table_wood" type="2d" file="assets/g1_table_wood.png" />
+    <material name="g1_table_wood" texture="g1_table_wood" />
+  </asset>
+  <worldbody>
+    <body name="g1_bottle" pos="3.55 -2.08 0.76" quat="1 0 0 0">
+      <joint name="g1_bottle_joint" type="free" limited="false" actuatorfrclimited="false" damping="0.0005" />
+      <inertial pos="0 0 0.095" mass="0.12" diaginertia="0.00043 0.00043 0.000061" />
+      <geom name="g1_bottle_shell" contype="0" conaffinity="0" group="1" type="mesh" mesh="g1_bottle_shell" rgba=".86 .9 .95 .4" />
+      <geom name="g1_bottle_label" contype="0" conaffinity="0" group="1" type="mesh" mesh="g1_bottle_label" material="g1_bottle_print" />
+      <geom name="g1_bottle_cap" contype="0" conaffinity="0" group="1" type="cylinder" size=".0155 .0125" pos="0 0 .2025" rgba=".57 .05 .066 1" />
+      <geom name="g1_bottle_liquid" contype="0" conaffinity="0" group="1" type="cylinder" size=".028 .046" pos="0 0 .054" rgba=".83 .89 .94 .13" />
+      <geom name="g1_bottle_physical_main" contype="1" conaffinity="1" group="3" rgba="0 0 0 0" friction="0.8 .005 .0001" type="mesh" mesh="g1_bottle_collision" />
+      <geom name="g1_bottle_physical_cap" contype="1" conaffinity="1" group="3" rgba="0 0 0 0" friction="0.8 .005 .0001" type="cylinder" size=".0152 .013" pos="0 0 .202" />
+    </body>
+    <body name="g1_round_table" pos="3.52119472 -2.44850406 0" quat="0.518277499 0 0 -0.855212508">
+      <geom name="g1_round_table_support" type="cylinder" pos="0 0 0.7425" size="0.45 0.0175" rgba="0.589999974 0.540000021 0.430000007 1" friction=".7 .005 .0001" />
+      <geom name="g1_round_table_pedestal" type="cylinder" pos="0 0 0.36" size="0.063 0.36" rgba="0.0179999992 0.0199999996 0.0219999999 1" friction=".7 .005 .0001" />
+      <geom name="g1_round_table_foot" type="cylinder" pos="0 0 0.04" size="0.29 0.04" rgba="0.0179999992 0.0199999996 0.0219999999 1" friction=".7 .005 .0001" />
+      <geom name="g1_round_table_veneer" type="mesh" mesh="g1_round_veneer" material="g1_table_wood" contype="0" conaffinity="0" group="1" />
+    </body>
+  </worldbody>
+</mujoco>

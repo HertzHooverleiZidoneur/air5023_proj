@@ -4,6 +4,7 @@
 third_party/
 out/
 scenes/kitchen/generated/
+scenes/round_table/generated/
 __pycache__/
 .pytest_cache/
 *.py[cod]

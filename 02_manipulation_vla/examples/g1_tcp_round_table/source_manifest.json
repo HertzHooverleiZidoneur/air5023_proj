@@ -1,0 +1,34 @@
+{
+  "schema_version": "g1-tcp-1.0",
+  "capture_id": "g1_bottle_1103",
+  "aligned_isaac_replay": "left_hand_clear_fixed",
+  "source_artifacts_sha256": {
+    "scene.usda": "975d79b72d83aaf8c7c291ce053c06f08f4b70da0a7031598219eb60e67fff14",
+    "replay.usda": "614284d3022bbeb2952a04f7757872f12e57b04f54e3469391d4d6f95a627a66",
+    "trajectory.jsonl": "2f1483e71dc41dfb0231502b46a503fd7102aefb5bc231b16188e620f3ea3b17"
+  },
+  "g1_tcp_source_npz_sha256": "7de512d0d288d9e22f9a4acac5a7cf7c7bda7513ef99fbd88b9ba6b20a5f7758",
+  "sample_count": 433,
+  "source_hz": 24,
+  "target_control_hz": 20,
+  "command_edges_s": [
+    2.875,
+    13.25
+  ],
+  "xy_rotation_deg": -117.56643943214118,
+  "wrist_to_pinch_m": [
+    0.16237446207311185,
+    0.06346136011687037,
+    0.02837806097431588
+  ],
+  "pinch_calibration_frame_range_inclusive": [
+    183,
+    223
+  ],
+  "fields": {
+    "time": "seconds from start, shape (N,)",
+    "tcp": "approximate right-hand pinch center in Isaac world coordinates, metres, shape (N,3)",
+    "rotation_xy": "planar rotation mapping source deltas to Stretch world XY, shape (2,2)",
+    "close": "binary command, 0 open / 1 closed, shape (N,)"
+  }
+}

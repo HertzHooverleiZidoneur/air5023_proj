@@ -7,11 +7,13 @@
 | 文件 | 当前能力 |
 |---|---|
 | [manipulation/arm_controller.py](manipulation/arm_controller.py) | 五个独立手臂坐标的有界 IK |
+| [manipulation/tcp_retarget.py](manipulation/tcp_retarget.py) | G1 TCP 位置迁移、圆桌承托检查和撤手 |
 | [tasks/pick_red_cup.py](tasks/pick_red_cup.py) | 初始化→导航→抓取→抬升→检查，支持阶段回调 |
 | [vla/policy_interface.py](vla/policy_interface.py) | `reset/predict` 协议和动作块执行循环 |
 | [vla/observation_adapter.py](vla/observation_adapter.py) | 明确状态顺序、图像、时间与夹爪归一化 |
 | [vla/action_adapter.py](vla/action_adapter.py) | 标准 Action、范围校验与执行 |
 | [run_task.py](run_task.py) | 完整固定任务 GUI / headless 入口 |
+| [run_tcp_retarget.py](run_tcp_retarget.py) | 固定 dock 起步的圆桌水瓶抓放 |
 
 在项目根目录运行：
 
@@ -19,6 +21,8 @@
 .venv/bin/python 02_manipulation_vla/run_task.py
 .venv/bin/python 02_manipulation_vla/run_task.py --headless --no-cameras
 ```
+
+圆桌示例的运行命令、输入数据和验收结果见 [抓放交接说明](examples/g1_tcp_round_table/README.md)。`run_retarget(robot, replay, ...)` 接收已停稳的机器人实例。示例入口使用 `dock.json` 初始化该实例。
 
 ## 本组任务
 
